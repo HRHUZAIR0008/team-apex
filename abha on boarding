@@ -24,3 +24,284 @@
     </application>
 
 </manifest>
+
+interface ApiService {
+    @POST("register")
+    fun register(@Body request: RegisterRequest): Call<RegisterResponse>
+
+    @POST("login")
+    fun login(@Body request: LoginRequest): Call<LoginResponse>
+
+    @PUT("profile")
+    fun updateProfile(@Body request: ProfileUpdateRequest): Call<ProfileUpdateResponse>
+
+    @POST("scan-and-share")
+    fun scanAndShare(@Body request: ScanAndShareRequest): Call<ScanAndShareResponse>
+}
+object RetrofitClient {
+    private const val BASE_URL = "http://your-backend-url.com"
+
+    val instance: ApiService by lazy {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        retrofit.create(ApiService::class.java)
+    }
+}
+<EditText
+    android:id="@+id/et_mobile"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:hint="Mobile Number" />
+
+<EditText
+    android:id="@+id/et_aadhaar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:hint="Aadhaar Number" />
+
+<EditText
+    android:id="@+id/et_password"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:hint="Password"
+    android:inputType="textPassword" />
+
+<Button
+    android:id="@+id/btn_register"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Register" />
+class RegisterActivity : AppCompatActivity() {
+
+    private lateinit var mobileEditText: EditText
+    private lateinit var aadhaarEditText: EditText
+    private lateinit var passwordEditText: EditText
+    private lateinit var registerButton: Button
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_register)
+
+        mobileEditText = findViewById(R.id.et_mobile)
+        aadhaarEditText = findViewById(R.id.et_aadhaar)
+        passwordEditText = findViewById(R.id.et_password)
+        registerButton = findViewById(R.id.btn_register)
+
+        registerButton.setOnClickListener {
+            val mobile = mobileEditText.text.toString()
+            val aadhaar = aadhaarEditText.text.toString()
+            val password = passwordEditText.text.toString()
+
+            val request
+data class RegisterRequest(
+    val mobile: String,
+    val aadhaar: String,
+    val password: String
+)
+
+data class RegisterResponse(
+    val message: String
+)
+class RegisterActivity : AppCompatActivity() {
+
+    private lateinit var mobileEditText: EditText
+    private lateinit var aadhaarEditText: EditText
+    private lateinit var passwordEditText: EditText
+    private lateinit var registerButton: Button
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_register)
+
+        // Initialize views
+        mobileEditText = findViewById(R.id.et_mobile)
+        aadhaarEditText = findViewById(R.id.et_aadhaar)
+        passwordEditText = findViewById(R.id.et_password)
+        registerButton = findViewById(R.id.btn_register)
+
+        // Set click listener on register button
+        registerButton.setOnClickListener {
+            val mobile = mobileEditText.text.toString()
+            val aadhaar = aadhaarEditText.text.toString()
+            val password = passwordEditText.text.toString()
+
+            // Validate inputs
+            if (mobile.isEmpty() || aadhaar.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Prepare API call
+            val registerRequest = RegisterRequest(mobile, aadhaar, password)
+            registerUser(registerRequest)
+        }
+    }
+
+    // Function to call the registration API
+    private fun registerUser(registerRequest: RegisterRequest) {
+        RetrofitClient.instance.register(registerRequest).enqueue(object : Callback<RegisterResponse> {
+            override fun onResponse(call: Call<RegisterResponse>, response: Response<RegisterResponse>) {
+                if (response.isSuccessful) {
+                    Toast.makeText(this@RegisterActivity, response.body()?.message, Toast.LENGTH_SHORT).show()
+                    // Optionally navigate to the next screen, e.g., login
+                } else {
+                    Toast.makeText(this@RegisterActivity, "Registration failed", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<RegisterResponse>, t: Throwable) {
+                Toast.makeText(this@RegisterActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+}
+<EditText
+    android:id="@+id/et_login_mobile"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:hint="Mobile Number" />
+
+<EditText
+    android:id="@+id/et_login_password"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:hint="Password"
+    android:inputType="textPassword" />
+
+<Button
+    android:id="@+id/btn_login"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Login" />
+class LoginActivity : AppCompatActivity() {
+
+    private lateinit var mobileEditText: EditText
+    private lateinit var passwordEditText: EditText
+    private lateinit var loginButton: Button
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_login)
+
+        // Initialize views
+        mobileEditText = findViewById(R.id.et_login_mobile)
+        passwordEditText = findViewById(R.id.et_login_password)
+        loginButton = findViewById(R.id.btn_login)
+
+        // Set click listener on login button
+        loginButton.setOnClickListener {
+            val mobile = mobileEditText.text.toString()
+            val password = passwordEditText.text.toString()
+
+            // Validate inputs
+            if (mobile.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Prepare API call
+            val loginRequest = LoginRequest(mobile, password)
+            loginUser(loginRequest)
+        }
+    }
+
+    // Function to call the login API
+    private fun loginUser(loginRequest: LoginRequest) {
+        RetrofitClient.instance.login(loginRequest).enqueue(object : Callback<LoginResponse> {
+            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+                if (response.isSuccessful) {
+                    Toast.makeText(this@LoginActivity, response.body()?.message, Toast.LENGTH_SHORT).show()
+                    // Save token for future requests (shared preferences)
+                    val token = response.body()?.token
+                    // Navigate to the next screen (e.g., Dashboard)
+                } else {
+                    Toast.makeText(this@LoginActivity, "Login failed", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                Toast.makeText(this@LoginActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+}
+data class ProfileUpdateRequest(
+    val id: Int,   // User ID
+    val mobile: String?,
+    val email: String?
+)
+
+data class ProfileUpdateResponse(
+    val message: String
+)
+class ProfileUpdateActivity : AppCompatActivity() {
+
+    private lateinit var mobileEditText: EditText
+    private lateinit var emailEditText: EditText
+    private lateinit var updateButton: Button
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_profile_update)
+
+        // Initialize views
+        mobileEditText = findViewById(R.id.et_profile_mobile)
+        emailEditText = findViewById(R.id.et_profile_email)
+        updateButton = findViewById(R.id.btn_update_profile)
+
+        // Set click listener on update button
+        updateButton.setOnClickListener {
+            val newMobile = mobileEditText.text.toString()
+            val newEmail = emailEditText.text.toString()
+
+            // Assuming user ID is saved (retrieve from shared preferences)
+            val user
+private fun generateQRCode(userId: Int) {
+    val content = "UserId:$userId"  // Customize the content to share
+
+    val writer = QRCodeWriter()
+    try {
+        val bitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, 512, 512)
+        val width = bitMatrix.width
+        val height = bitMatrix.height
+        val bmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
+
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                bmp.setPixel(x, y, if (bitMatrix.get(x, y)) Color.BLACK else Color.WHITE)
+            }
+        }
+
+        // Set the bitmap to an ImageView (QR code display)
+        qrImageView.setImageBitmap(bmp)
+
+    } catch (e: WriterException) {
+        e.printStackTrace()
+    }
+}
+private fun saveToken(token: String) {
+    val sharedPreferences = getSharedPreferences("ABHAApp", MODE_PRIVATE)
+    val editor = sharedPreferences.edit()
+    editor.putString("JWT_TOKEN", token)
+    editor.apply()
+}
+private fun getToken(): String? {
+    val sharedPreferences = getSharedPreferences("ABHAApp", MODE_PRIVATE)
+    return sharedPreferences.getString("JWT_TOKEN", null)
+}
+val client = OkHttpClient.Builder().addInterceptor { chain ->
+    val request = chain.request().newBuilder()
+        .addHeader("Authorization", "Bearer " + getToken())
+        .build()
+    chain.proceed(request)
+}.build()
+
+val retrofit = Retrofit.Builder()
+    .baseUrl(BASE_URL)
+    .client(client)
+    .addConverterFactory(GsonConverterFactory.create())
+    .build()
+
